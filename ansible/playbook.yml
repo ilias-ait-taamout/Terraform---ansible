@@ -1,0 +1,19 @@
+- name: Install and configure nginx
+  hosts: web
+  become: true
+  tasks:
+    - name: Install nginx
+      apt:
+        name: nginx
+        state: present
+        update_cache: yes
+
+    - name: Start nginx
+      service:
+        name: nginx
+        state: started
+
+    - name: Copy custom index.html
+      copy:
+        src: index.html
+        dest: /var/www/html/index.html

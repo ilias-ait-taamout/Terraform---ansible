@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ilias | DevOps Project</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f0f0f;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      text-align: center;
+      padding: 40px;
+    }
+
+    .badge {
+      background: #ff9900;
+      color: #000;
+      font-weight: bold;
+      font-size: 0.8rem;
+      padding: 5px 14px;
+      border-radius: 20px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      display: inline-block;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    h1 span {
+      color: #ff9900;
+    }
+
+    p.subtitle {
+      font-size: 1.1rem;
+      color: #aaa;
+      margin-bottom: 40px;
+    }
+
+    .stack {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 40px;
+    }
+
+    .tag {
+      background: #1a1a1a;
+      border: 1px solid #333;
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      color: #ccc;
+    }
+
+    .tag span {
+      margin-right: 6px;
+    }
+
+    .infra-box {
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      border-radius: 12px;
+      padding: 24px 32px;
+      display: inline-block;
+      text-align: left;
+      margin-bottom: 40px;
+    }
+
+    .infra-box h3 {
+      color: #ff9900;
+      margin-bottom: 14px;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .infra-box ul {
+      list-style: none;
+    }
+
+    .infra-box ul li {
+      padding: 6px 0;
+      color: #ccc;
+      font-size: 0.95rem;
+    }
+
+    .infra-box ul li::before {
+      content: "✓ ";
+      color: #ff9900;
+      font-weight: bold;
+    }
+
+    footer {
+      color: #555;
+      font-size: 0.85rem;
+    }
+
+    footer span {
+      color: #ff9900;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <div class="badge">🚀 Deployed via DevOps Pipeline</div>
+
+    <h1>Hello, I'm <span>Ilias</span></h1>
+    <p class="subtitle">This server was provisioned with Terraform and configured with Ansible</p>
+
+    <div class="stack">
+      <div class="tag"><span>☁️</span> AWS EC2</div>
+      <div class="tag"><span>🏗️</span> Terraform</div>
+      <div class="tag"><span>⚙️</span> Ansible</div>
+      <div class="tag"><span>🌐</span> Nginx</div>
+      <div class="tag"><span>🐧</span> Ubuntu</div>
+    </div>
+
+    <div class="infra-box">
+      <h3>Infrastructure Summary</h3>
+      <ul>
+        <li>EC2 instance provisioned on AWS</li>
+        <li>Security Group: SSH (22) + HTTP (80)</li>
+        <li>Nginx installed and running</li>
+        <li>Deployed with Ansible Playbook</li>
+        <li>Region: us-east-1</li>
+      </ul>
+    </div>
+
+    <footer>Built by <span>Ilias AIT TAAMOUT</span> · Terraform + Ansible Project</footer>
+
+  </div>
+</body>
+</html>
