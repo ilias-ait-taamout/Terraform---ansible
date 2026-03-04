@@ -49,3 +49,33 @@ Step 2 : Terraform code
 		region = "eu-west-3"
 		instance_type = "t3.micro"
 		key_name = "your-key-name"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+**The professional solution → Remote Backend**
+
+Instead of storing `tfstate` locally, you store it in **AWS S3 + DynamoDB**:
+```
+Your Machine → terraform apply → state saved in S3 bucket
+                                        ↕
+                              DynamoDB locks the state
+                              (prevents two people applying at same time)
