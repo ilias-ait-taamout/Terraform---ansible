@@ -328,15 +328,9 @@ terraform.tfvars
 
 ---
 
-## 🚀 Next Steps (Bonus) (version 2)
+## 🚀 Next Steps (version 2)
 
 - [ ] Remote Terraform backend (S3 + DynamoDB)
-- [ ] Convert Ansible tasks into Roles
-- [ ] CI/CD pipeline with GitHub Actions
-- [ ] Separate dev and prod environments
-
-
-
 
 **The professional solution to not pushing the state files in github... → Remote Backend**
 
@@ -346,3 +340,134 @@ Your Machine → terraform apply → state saved in S3 bucket
                                         ↕
                               DynamoDB locks the state
                               (prevents two people applying at same time)
+
+
+## 🔵 VERSION 2 – Remote Backend (S3 + DynamoDB)
+
+### Why Remote Backend?
+
+| Local tfstate ❌ | Remote Backend ✅ |
+|-----------------|-----------------|
+| Stored only on your machine | Stored in S3 (centralized) |
+| Risk of accidental deletion | Safe and encrypted |
+| No version history | Full version history with S3 versioning |
+| Two engineers can conflict | DynamoDB lock prevents conflicts |
+| Sensitive data risk if pushed to GitHub | Never touches GitHub |
+
+---
+
+### How it works
+
+```
+Engineer hits terraform apply
+           ↓
+DynamoDB creates a lock (one engineer at a time)
+           ↓
+Changes applied to AWS infrastructure
+           ↓
+tfstate updated in S3
+           ↓
+DynamoDB lock released ✅
+```
+
+If a second engineer tries to apply at the same time:
+```
+❌ Error: state file already locked
+→ Engineer 2 waits until lock is released
+```
+
+---
+
+### STEP 1 – Create backend-setup.tf
+
+Creates the S3 bucket and DynamoDB table:
+
+resource "aws_s3_bucket" "tfstate_bucket" {
+  bucket = "tfstate-ilias-devops-2024"
+  tags = {
+    Name        = "tfstate_bucket"
+    Environment = "dev"
+  }
+}
+
+resource "aws_s3_bucket_versioning" "tfstate_versioning" {
+  bucket = aws_s3_bucket.tfstate_bucket.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_dynamodb_table" "Lock-tfstate" {
+  name         = "Lock-tfstate"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "LockID"
+  attribute {
+    name = "LockID"
+    type = "S"
+  }
+}
+
+
+> 💡 `billing_mode = "PAY_PER_REQUEST"` → you only pay when the table is used. Perfect for this use case.  
+> 💡 `hash_key = "LockID"` → this name is mandatory. Terraform specifically looks for `LockID` to manage state locking. Do NOT change it.  
+> 💡 S3 versioning → every tfstate update keeps previous versions. You can roll back if something goes wrong.
+
+Run:
+terraform apply
+---
+
+### STEP 2 – Create backend.tf
+
+Tells Terraform to USE the S3 bucket and DynamoDB table as its backend:
+
+terraform {
+  backend "s3" {
+    bucket         = "tfstate-ilias-devops-2024"
+    key            = "terraform/terraform.tfstate"
+    region         = "us-east-1"
+    dynamodb_table = "Lock-tfstate"
+    encrypt        = true
+  }
+}
+
+
+> 💡 `key` → the path inside the S3 bucket where tfstate will be stored  
+> 💡 `encrypt = true` → state file is encrypted at rest in S3 ✅
+
+
+
+### STEP 3 – Migrate local state to S3
+
+terraform init
+
+
+Terraform will detect the new backend and ask:
+
+Do you want to copy existing state to the new backend?
+Enter a value: yes
+
+Type `yes` — Terraform migrates your local tfstate to S3 automatically.
+
+### ✅ Expected Output
+```
+Successfully configured the backend "s3"!
+Terraform will automatically use this backend unless the backend configuration changes.
+Terraform has been successfully initialized!
+```
+
+---
+
+### STEP 4 – Verify
+
+Verify in AWS Console:
+```
+S3 → tfstate-ilias-devops-2024 → terraform/terraform.tfstate ✅
+```
+
+Verify locally:
+
+terraform plan
+# Expected: No changes. Your infrastructure matches the configuration.
+---
+
+
